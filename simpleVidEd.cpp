@@ -42,7 +42,7 @@ string make_folder(string filepath)         //makes folder from filepath
 
 int main(int argc, char* argv[])
 {
-    //descriptin of program
+    //description of program
     std::cout << "\nVIDed\n"
         "You can slide through the video by trackbar(it shows number of frames passed)\n"
         "To exit press ESC (or if you want to close only cropped window press q)\n"
@@ -56,9 +56,9 @@ int main(int argc, char* argv[])
 
     std::cout << "Enter video file path(or number for video stream(0 - any stream)): ";
 
-    std::string filen;     //= argc == 2 ? argv[1] : "D:\\video2.mp4";      //sets user's path to file or use default value (to set value, add an argument when starting a program)
+    std::string filen;   //sets user's file path
     cin >> filen;
-    const std::string filepath = filen;//"D:\\video2.mp4";//
+    const std::string filepath = filen;
 
     const string filedir = filepath.substr(0, filepath.find_last_of("\\/"));      //"find_last_of" find pos of argument; "substr" makes str in measures from ..to..;
     const string filename = filepath.substr(filepath.find_last_of("\\/") + 1, (filepath.length() - filepath.find_last_of("\\/") - 1) - (filepath.length() - filepath.find_last_of(".")));
@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
     if (is_number(filepath))
     {
         stream = true;
-        cap.open(stoi(filepath), CAP_ANY);    //open file with path "filepath"
+        cap.open(stoi(filepath), CAP_ANY);    //open stream (filepath - number)
     }
     else
     {
@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
     }
 
     double FPS = cap.get(CAP_PROP_FPS);                   //fps in opened video
-    if (stream) {//getting more accurate FPS value if stream
+    if (stream) {//getting more accurate FPS value if stream 
 
         int num_frames = 120;//some frames must pass to get time
         time_t start, end;
@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
     Mat cropped_frame;      //obj to save cropped frame by ROI
     string std_window = "std";  //name of default window
     int screenshot_count = 1;
-    float fps_reduse_increase = 1;
+    float fps_reduse_increase = 1;  //koefficien of video speed
 
 
     const char cropped_window_name[8] = "ROI vid"; //name of cropped frame window
@@ -130,17 +130,18 @@ int main(int argc, char* argv[])
             break;
         }
 
-        int currpos = cap.get(CAP_PROP_POS_FRAMES);     //number of frames passed 
-        if (FRAME_COUNT != 0 and !is_number(filepath))                           //creating slider - trackbar, which shows currpos
-        {
-            createTrackbar("Pos", std_window, &currpos, FRAME_COUNT, myTrackbarCback);
-        }
-
+       
         // Display the resulting frame
         if (!myROI.empty()) {                  //if ROI selected, showing cropped frame(+keys)
             cropped_frame = frame(myROI);
 
             imshow(cropped_window_name, cropped_frame);   //showing frame
+
+            int currpos = cap.get(CAP_PROP_POS_FRAMES);     //number of frames passed 
+            if (FRAME_COUNT != 0 and !is_number(filepath))                           //creating slider - trackbar, which shows currpos
+            {
+                createTrackbar("Pos", cropped_window_name, &currpos, FRAME_COUNT, myTrackbarCback);
+            }
 
             if (stream_rec and stream) {        //recording stream frames if ...
                 stream_writer.write(cropped_frame);
@@ -247,34 +248,39 @@ int main(int argc, char* argv[])
                     cout << "Stream record started" << endl;
                 }
             }
+
         }
 
         else {
             imshow(std_window, frame);      //if ROI isnt selected, showing default frame
 
-            char c = (char)cv::waitKey(WAIT_SEC / fps_reduse_increase);     // Press ESC to exit, backspace to select ROI, numbers 1,2 to select rec_start_frame, rec_stop_frame
-
-            if (stream_rec and stream)
-            {        //recording stream frames if ...
-                stream_writer.write(frame);
+            int currpos = cap.get(CAP_PROP_POS_FRAMES);     //number of frames passed 
+            if (FRAME_COUNT != 0 and !is_number(filepath))                           //creating slider - trackbar, which shows currpos
+            {
+                createTrackbar("Pos", std_window, &currpos, FRAME_COUNT, myTrackbarCback);
             }
 
+            if (stream_rec and stream)          //recording stream frames if ...
+            {        
+                stream_writer.write(frame);
+            }
+            char c = (char)cv::waitKey(WAIT_SEC / fps_reduse_increase);     // Press ESC to exit, backspace to select ROI, numbers 1,2 to select rec_start_frame, rec_stop_frame
+
             //key events
-            if (c == 27) //ESC
+            if (c == 27) //ESC  //quit program
             {
                 destroyWindow(std_window);
                 break;
             }
-            else if (c == 32) //space
+            else if (c == 32) //space   //pause
             {
-                waitKey(300);           //pause
+                waitKey(300);   
                 ispaused = !ispaused;
             }
-            else if (c == 8) //backspace
+            else if (c == 8) //backspace        //select ROI
             {
                 myROI = selectROI(std_window, frame, false, false);
             }
-
             else if (c == 53) {  //5        //screenshot
                 if (screenshot_count == 1)
                 {
@@ -327,7 +333,7 @@ int main(int argc, char* argv[])
                 stream_rec = false;
                 cout << "saving video" << name << endl;
             }
-            else if (c == 122 ) {        //z  //start recording stream video 
+            else if (c == 122 ) {        //z  //start recording video 
                 if (count_video_saves == 1) {
                     videorecord_folder_path =make_folder(filepath);
                 }
@@ -350,7 +356,7 @@ int main(int argc, char* argv[])
                     rec_stop_frame = 0;
                     cap.set(CAP_PROP_POS_FRAMES, return_frame);
                     }
-                }
+                
                 else if (stream){
                 if (count_video_saves == 1)
                 {
@@ -363,10 +369,11 @@ int main(int argc, char* argv[])
                 }
             }
         }
+    }
 
     cap.release();  //release VideoCapture object
 
-    // Closes all frames
+    // Closes all windows
     cv::destroyAllWindows();
 
     return 0;
