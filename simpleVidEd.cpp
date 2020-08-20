@@ -180,15 +180,15 @@ int main(int argc, char* argv[])
             else if (c == 8) {  //backspace
                 myROI = selectROI(std_window, frame, false, false);     //select ROI
             }
-            else if (c == 49) { //1
+            else if (c == 49 and !stream) { //1
                 rec_start_frame = cap.get(CAP_PROP_POS_FRAMES);         //choosing record start time(saves current frame)
                 std::cout << "rec_start_frame " << rec_start_frame << endl;
             }
-            else if (c == 50) { //2
+            else if (c == 50 and !stream) { //2
                 rec_stop_frame = cap.get(CAP_PROP_POS_FRAMES);          //choosing record stop time(saves current frame)
                 std::cout << "rec_stop_frame " << rec_stop_frame << endl;
             }
-            else if (c == 55) { //7
+            else if (c == 55 and !stream) { //7
                 if (fps_reduse_increase == 0.25) { continue; } //if min value - skip
                 else if (fps_reduse_increase > 1) {     //reduse var by 1 if var>1; by 0.25 if 0<var<=1
                     fps_reduse_increase -= 1;
@@ -196,9 +196,9 @@ int main(int argc, char* argv[])
                 else if (fps_reduse_increase > 0 and fps_reduse_increase <= 1) {
                     fps_reduse_increase -= 0.25;
                 }
-                cout << "Current speed variation is: " << fps_reduse_increase << endl;
+                cout << "Current speed is: " << fps_reduse_increase << endl;
             }
-            else if (c == 56) { //8
+            else if (c == 56 and !stream) { //8
                 if (fps_reduse_increase == 4) { continue; } ////if max value - skip
                 else if (fps_reduse_increase >= 1) {    //increase on 1 if var>=1; on 0.25 if 0<var<1
                     fps_reduse_increase += 1;
@@ -206,7 +206,7 @@ int main(int argc, char* argv[])
                 else if (fps_reduse_increase > 0 and fps_reduse_increase < 1) {
                     fps_reduse_increase += 0.25;
                 }
-                cout << "Current speed variation is: " << fps_reduse_increase << endl;
+                cout << "Current speed is: " << fps_reduse_increase << endl;
             }
             else if (c == 120 and stream) {        //x  //stop recording stream video 
                 stream_writer.release();    //releasing VideoWriter obj
@@ -216,10 +216,10 @@ int main(int argc, char* argv[])
                 cout << "saving video" << name << endl;
             }
             else if (c == 122 ) {        //z  //start recording stream video 
-                if (count_video_saves == 1) {
-                    videorecord_folder_path = make_folder(filepath);
-                }
                 if (rec_start_frame >= 0 and rec_stop_frame >= 0 and !stream) {           //if time range is set and not stream - record
+                    if (count_video_saves == 1) {
+                        videorecord_folder_path = make_folder(filepath);
+                    }
                     int return_frame = cap.get(CAP_PROP_POS_FRAMES);
 
                     cap.set(CAP_PROP_POS_FRAMES, rec_start_frame);  //setting rec start frame pos
@@ -299,15 +299,15 @@ int main(int argc, char* argv[])
                 }
                 waitKey(100);
             }
-            else if (c == 49) { //1
+            else if (c == 49 and !stream) { //1
                 rec_start_frame = cap.get(CAP_PROP_POS_FRAMES);
                 std::cout << "rec_start_frame " << rec_start_frame << endl;
             }
-            else if (c == 50) { //2
+            else if (c == 50 and !stream) { //2
                 rec_stop_frame = cap.get(CAP_PROP_POS_FRAMES);
                 std::cout << "rec_stop_frame " << rec_stop_frame << endl;
             }
-            else if (c == 55) { //7
+            else if (c == 55 and !stream) { //7
                 if (fps_reduse_increase == 0.25) { continue; } //if min value - skip
                 else if (fps_reduse_increase > 1) {     //reduse var by 1 if var>1; by 0.25 if 0<var<=1
                     fps_reduse_increase -= 1;
@@ -315,9 +315,9 @@ int main(int argc, char* argv[])
                 else if (fps_reduse_increase > 0 and fps_reduse_increase <= 1) {
                     fps_reduse_increase -= 0.25;
                 }
-                cout << "Current speed variation is: " << fps_reduse_increase << endl;
+                cout << "Current speed is: " << fps_reduse_increase << endl;
             }
-            else if (c == 56) { //8
+            else if (c == 56 and !stream) { //8
                 if (fps_reduse_increase == 4) { continue; } ////if max value - skip
                 else if (fps_reduse_increase >= 1) {    //increase on 1 if var>=1; on 0.25 if 0<var<1
                     fps_reduse_increase += 1;
@@ -325,7 +325,7 @@ int main(int argc, char* argv[])
                 else if (fps_reduse_increase > 0 and fps_reduse_increase < 1) {
                     fps_reduse_increase += 0.25;
                 }
-                cout << "Current speed variation is: " << fps_reduse_increase << endl;
+                cout << "Current speed is: " << fps_reduse_increase << endl;
             }
             else if (c == 120 and stream) {        //x  //stop recording stream video 
                 stream_writer.release();        //releasing VideoWriter obj
@@ -334,10 +334,11 @@ int main(int argc, char* argv[])
                 cout << "saving video" << name << endl;
             }
             else if (c == 122 ) {        //z  //start recording video 
-                if (count_video_saves == 1) {
-                    videorecord_folder_path =make_folder(filepath);
-                }
+                
                 if (rec_start_frame >= 0 and rec_stop_frame >= 0 and !stream) {           //if time range is set and not stream - record
+                    if (count_video_saves == 1) {
+                        videorecord_folder_path = make_folder(filepath);
+                    }
                     int return_frame = cap.get(CAP_PROP_POS_FRAMES);
 
                     cap.set(CAP_PROP_POS_FRAMES, rec_start_frame);  //setting rec start frame pos
@@ -355,7 +356,7 @@ int main(int argc, char* argv[])
                     rec_start_frame = 0;
                     rec_stop_frame = 0;
                     cap.set(CAP_PROP_POS_FRAMES, return_frame);
-                    }
+                }
                 
                 else if (stream){
                 if (count_video_saves == 1)
