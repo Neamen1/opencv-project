@@ -1,5 +1,5 @@
 # opencv-project
-Simple video editor in opencv (opencv don't support sound)
+Simple video editor in opencv (opencv don't support sound)\n
 To set file directory, write path to the file in command line
 You can slide through the video by trackbar(it shows number of frames passed)
 You can choose ROI(region of interest) by pressing backspace and use LMB
